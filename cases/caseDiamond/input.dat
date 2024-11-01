@@ -1,0 +1,23 @@
+
+pressure, 1e5
+mach, 2.0
+temperature, 300.
+nx, 0.999847695
+ny, 0.017452406
+
+BC:up, inlet
+BC:down, inlet
+BC:outlet, outlet
+BC:wall, wall
+BC:inlet, inlet
+
+Nmax, 1000
+interpE, 1e-10
+order, 2
+stages, 5
+threads, 4
+flux, AUSMDV
+tube, 0
+axisymmetric, 0
+CFL, 1.0
+restart, 0

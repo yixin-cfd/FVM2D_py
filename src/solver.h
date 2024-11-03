@@ -14,22 +14,22 @@ typedef struct{
 
 typedef struct {
 
-    int Nvar;
-    int Nrow;
-    int Ncol;
+    int Nvar;       /*!< \brief 变量总数 */
+    int Nrow;       /*!< \brief 行数 */
+    int Ncol;       /*!< \brief 列数 */
     int pOutFlag;
     int order;
     int flux;
     int stages;
     int laminar;
-    int restart;
-    int sa;
+    int restart;    /*!< \brief 是否输出续算文件 */
+    int sa;         /*!< \brief 是否使用湍流SA方程 */
     int dtLocal;
 
-    char* wd;
+    char* wd;       /*!< 工作目录 */
 
-    double Rgas;
-    double gamma;
+    double Rgas;    /*!< \brief 气体常数R */
+    double gamma;   /*!< \brief 比热比γ */
     double k4;
     double dt;
     double pout;
@@ -74,7 +74,7 @@ void solverFree(SOLVER* solver);
 
 void solverWriteSolution(SOLVER* solver);
 
-void solverWriteReestart(SOLVER* solver);
+void solverWriteRestart(SOLVER* solver);
 
 void solverLoadRestart(SOLVER* solver, char* fileName);
 

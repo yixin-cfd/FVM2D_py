@@ -15,17 +15,17 @@
 int main(int argc, char **argv)
 {
 
-    struct timeval start, stop;
+    struct timeval start, stop;             // 用于计算运行时间
     
-    gettimeofday(&start,NULL);
+    gettimeofday(&start,NULL);              // 得到当前时间，秒和微秒     
    
-    SOLVER* solver = solverInit(argv[1]);    
+    SOLVER* solver = solverInit(argv[1]);   // 初始化Solver
     
-    solverSolve(solver);
+    solverSolve(solver);                    // 
     
     solverWriteSolution(solver);
 
-    solverWriteReestart(solver);
+    solverWriteRestart(solver);
       
     solverFree(solver); 
 

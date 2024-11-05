@@ -11,7 +11,7 @@ typedef struct
 
 INPUT* inputInit(char* fileName, int N);        //!<  配置文件初始化
 
-void inputPrint(INPUT* input);
+void inputPrint(INPUT* input);                  //!< 打印配置文件
 
 int inputNameIsInput(INPUT* input, char* name); //!< 检查命令是否在配置文件中
 

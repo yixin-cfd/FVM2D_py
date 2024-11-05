@@ -1333,7 +1333,7 @@ SOLVER *solverInit(char *wd)
     // 加载几何
     s[0] = '\0';
     strcat(s, solver->wd);
-    strcat(s, "mesh.su2");
+    strcat(s, "mesh.su2");      // 网格文件路径
     solver->mesh = meshInit(s, solver->Nvar, atoi(inputGetValue(solver->input, "axisymmetric")));
 
     // Setting the solver

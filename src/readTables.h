@@ -1,17 +1,17 @@
 
 typedef struct{
 
-    int N; // Table number
-    int Ncol; // Number of collums
-    int Nrow; // Number of lines
-    double **values;
+    int N;      // 表序号
+    int Ncol;   // 表列数
+    int Nrow;   // 表行数
+    double **values;    // 二维表内容
 
 } TABLE;
 
 typedef struct{
 
-    int N; // Number of tables
-    TABLE** tables; // Tables pointers vector
+    int N;          // 表总数
+    TABLE** tables; // 表指针
 
 } TABLELIST;
 

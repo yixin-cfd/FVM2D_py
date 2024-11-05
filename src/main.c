@@ -14,6 +14,10 @@
 
 int main(int argc, char **argv)
 {
+    if(argc <= 1){
+        printf("please input case path!\n");
+        exit(0);
+    }
 
     struct timeval start, stop;             // 用于计算运行时间
     

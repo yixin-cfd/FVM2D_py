@@ -1,5 +1,5 @@
 
-double** tableMallocDouble(int Nrow, int Ncol);  
+double** tableMallocDouble(int Nrow, int Ncol);  /*!< \brief 分配Nrow*Ncol 大小二维表格*/
  
 int** tableMallocInt(int Nrow, int Ncol);
 

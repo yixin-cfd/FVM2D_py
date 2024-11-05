@@ -45,17 +45,17 @@ ELEMENT* meshElementMalloc(int type, int Nvar)
 
     ELEMENT* e = malloc(sizeof(ELEMENT));
     
-    if(type==5)
+    if(type==5)     // 三角单元
     {
-        e->Np = 3;
+        e->Np = 3;  // 节点数量
         e->p = malloc(e->Np*sizeof(int));
         e->neiL = malloc(e->Np*sizeof(ELEMENT));
         e->f = malloc(e->Np*sizeof(int));
         e->neiN = 0;        
     }
-    else if(type==9)
+    else if(type==9)    // 四边单元
     {
-        e->Np = 4;
+        e->Np = 4;      // 节点数量
         e->p = malloc(e->Np*sizeof(int));
         e->neiL = malloc(e->Np*sizeof(ELEMENT));        
         e->f = malloc(e->Np*sizeof(int));
@@ -81,22 +81,22 @@ MESHBC* meshBCread(FILE* ff, int Nvar)
     char s[100];
     MESHBC* bc = malloc(sizeof(MESHBC));
     
-    meshGetWord(ff, s);
-    meshGetWord(ff, bc->name);
-    meshGetWord(ff, s);
+    meshGetWord(ff, s);         // MARKER_TAG=
+    meshGetWord(ff, bc->name);  // 边界段名称
+    meshGetWord(ff, s);         // MARKER_ELEMS=
     if(strcmp(s, "MARKER_ELEMS=")==0)
     {
         meshGetWord(ff, s);
-        bc->Nelem = atoi(s);
+        bc->Nelem = atoi(s);    // 边界单元数量
     }    
 
     bc->elemL = malloc(bc->Nelem*sizeof(ELEMENT));
     
     jj = 0;
-    while(jj<bc->Nelem)
+    while(jj < bc->Nelem)
     {
-        bc->elemL[jj] = meshElementMalloc(0, Nvar);   
-        bc->elemL[jj]->ii = jj;
+        bc->elemL[jj] = meshElementMalloc(0, Nvar);     // 线单元
+        bc->elemL[jj]->ii = jj;                         // 局部边界内部索引
     
         meshGetWord(ff, s);
         meshGetWord(ff, s);
@@ -121,16 +121,16 @@ MESH* meshInit(char* fileName, int Nvar, int axi)
     int type;
     mesh->axi = axi;
     
-    printf("mesh: reading elements.\n");
+    printf("mesh: reading elements.\n");    // 读取网格文件
     
     meshGetWord(ff, s);
-    if(strcmp(s, "NDIME=")==0)
+    if(strcmp(s, "NDIME=")==0)              // 读取维度数据
     {
         meshGetWord(ff, s);
         mesh->Ndim = atoi(s);
     }
 
-    meshGetWord(ff, s);
+    meshGetWord(ff, s);                     // 读取单元数量
     if(strcmp(s, "NELEM=")==0)
     {
         meshGetWord(ff, s);
@@ -140,12 +140,12 @@ MESH* meshInit(char* fileName, int Nvar, int axi)
     mesh->elemL = malloc(mesh->Nelem*sizeof(ELEMENT*));
     
     ii = 0;
-    while(ii<mesh->Nelem)
+    while(ii < mesh->Nelem)     // 读取单元
     {
-        meshGetWord(ff, s);
+        meshGetWord(ff, s);     // 读取单元类型
         type = atoi(s);
         
-        if(type==5)
+        if(type==5)             // 三角单元
         {       
             mesh->elemL[ii] = meshElementMalloc(5, Nvar);
          
@@ -156,7 +156,7 @@ MESH* meshInit(char* fileName, int Nvar, int axi)
             meshGetWord(ff, s);        
             mesh->elemL[ii]->p[2] = atoi(s);            
         }
-        else if(type==9)
+        else if(type==9)        // 四边单元
         {       
             mesh->elemL[ii] = meshElementMalloc(9, Nvar);
          
@@ -170,25 +170,25 @@ MESH* meshInit(char* fileName, int Nvar, int axi)
             mesh->elemL[ii]->p[3] = atoi(s);                        
         }
         
-        mesh->elemL[ii]->ii = ii;
+        mesh->elemL[ii]->ii = ii;   // 存储单元索引
         
         meshGetWord(ff, s);
         ii++;
     }
 
-    printf("mesh: reading points.\n");
+    printf("mesh: reading points.\n");  // 读取节点
 
     meshGetWord(ff, s);
     if(strcmp(s, "NPOIN=")==0)
     {
-        meshGetWord(ff, s);
+        meshGetWord(ff, s);             // 读取节点数量
         mesh->Np = atoi(s);
     }
     
-    mesh->p = tableMallocDouble(mesh->Np, 2);
+    mesh->p = tableMallocDouble(mesh->Np, 2);   // 为节点数组分配内存
     
-    ii = 0;
-    while(ii<mesh->Np)
+    ii = 0; 
+    while(ii < mesh->Np)                        // 读取节点数据
     {
         meshGetWord(ff, s);
         mesh->p[ii][0] = strtod(s, NULL);
@@ -198,31 +198,31 @@ MESH* meshInit(char* fileName, int Nvar, int axi)
         ii++;
     }    
     
-    printf("mesh: reading marks.\n");
+    printf("mesh: reading marks.\n");   // 读取边界标记
     
     meshGetWord(ff, s);
     if(strcmp(s, "NMARK=")==0)
     {
         meshGetWord(ff, s);
-        mesh->Nmark = atoi(s);
+        mesh->Nmark = atoi(s);          // 读取边界数量
     }    
     
-    mesh->bc = (MESHBC**)malloc(mesh->Nmark*sizeof(MESHBC*));
+    mesh->bc = (MESHBC**)malloc(mesh->Nmark*sizeof(MESHBC*));   // 边界段数组
     
     ii = 0;
-    while(ii<mesh->Nmark)
+    while(ii < mesh->Nmark)
     {
-        mesh->bc[ii] = meshBCread(ff, Nvar);
+        mesh->bc[ii] = meshBCread(ff, Nvar);    // 存储边界段
         ii++;
     }
     
-    fclose(ff);
+    fclose(ff);                                 // 网格文件所有内容读取完毕
 
     printf("mesh: calculating conections.\n");   
-    meshCalcConnection2(mesh);
+    meshCalcConnection2(mesh);                  // 计算单元邻接关系，存储边信息
     
     printf("mesh: calculating neighbors.\n");
-    meshCalcNeighbors(mesh);
+    meshCalcNeighbors(mesh);                    // 利用共享边信息更新单元数组的相应邻接单元
     for(ii=0; ii<mesh->Nmark; ii++)
     {
         meshBCneighbors(mesh->bc[ii], mesh);
@@ -549,72 +549,72 @@ void meshCalcConnection1(MESH* mesh)
 
 void meshCalcConnection2(MESH* mesh)
 {
-    mesh->Ncon = 0;
-    int Nface = 0;  
-    int flagCommon = 0;  
-    FACETYPE* initFace = malloc(sizeof(FACETYPE));
+    mesh->Ncon = 0;         // 单元间连接数
+    int Nface = 0;          // 已记录的边数量
+    int flagCommon = 0;     // 用于标记当前边是否与已有边重合
+    FACETYPE* initFace = malloc(sizeof(FACETYPE));  // FACETYPE 类型的链表头节点，用于存储所有边的信息
     FACETYPE* face = initFace;
     FACETYPE* face0;
 
-    for(int ii=0; ii<mesh->Nelem; ii++)
+    for(int ii=0; ii < mesh->Nelem; ii++)               // 遍历所有单元
     {
-        for(int jj=0; jj<mesh->elemL[ii]->Np; jj++)
+        for(int jj=0; jj < mesh->elemL[ii]->Np; jj++)   // 遍历此单元所有节点(jj和jj+1形成相应边)
         {
-            if(ii == 0 && jj == 0)
+            if(ii == 0 && jj == 0)                      // 第一个节点的第一条边用于初始化这个边链表结构
             {
-                face->p0 = mesh->elemL[ii]->p[jj];
-                face->p1 = mesh->elemL[ii]->p[(jj+1)%mesh->elemL[ii]->Np];
-                face->e0 = ii;
+                face->p0 = mesh->elemL[ii]->p[jj];      // 边的第一个节点
+                face->p1 = mesh->elemL[ii]->p[(jj+1)%mesh->elemL[ii]->Np];  // 边的第二个节点
+                face->e0 = ii;                          // 边所属单元
                 face->full = 0;
                 
-                Nface += 1;                
-                face->next = malloc(sizeof(FACETYPE));
+                Nface += 1;                             // 边总数+1
+                face->next = malloc(sizeof(FACETYPE));  // 为下一条边分配空间
                 face = face->next;    
             }
             else
             {
-                face->p0 = mesh->elemL[ii]->p[jj];
-                face->p1 = mesh->elemL[ii]->p[(jj+1)%mesh->elemL[ii]->Np];
-                face->e0 = ii;
+                face->p0 = mesh->elemL[ii]->p[jj];      // 边的第一个节点
+                face->p1 = mesh->elemL[ii]->p[(jj+1)%mesh->elemL[ii]->Np];  // 边的第二个节点
+                face->e0 = ii;                          // 边所属单元
                 face->full = 0;
                 
-                face0 = initFace;
-                flagCommon = 0;
-                for(int kk=0; kk<Nface; kk++)
+                face0 = initFace;                       // 指向边链表起点
+                flagCommon = 0;                         // 指示该边是否是两个单元的共享边
+                for(int kk=0; kk < Nface; kk++)         // 遍历所有边
                 {
-                    if(meshSameFace(face0, face))
+                    if(meshSameFace(face0, face))       // 存在同一条边
                     {
-                        face0->e1 = face->e0;
-                        face0->full = 1;
-                        flagCommon = 1;
-                        mesh->Ncon += 1;
+                        face0->e1 = face->e0;           // 更新邻接单元
+                        face0->full = 1;                // 该边有邻接单元
+                        flagCommon = 1;                 // 该边是共享边
+                        mesh->Ncon += 1;                // 共享边数+1
                         break;
                     }
-                    face0 = face0->next;   
+                    face0 = face0->next;                // 不断查找
                 }
             
-                if(!flagCommon)
+                if(!flagCommon)                         // 不是共享边
                 {
-                    Nface += 1;
-                    face->next = malloc(sizeof(FACETYPE));
+                    Nface += 1;                         // 是一条新的边
+                    face->next = malloc(sizeof(FACETYPE));  // 为下一条边分配空间
                     face = face->next;                    
                 }                            
             }
         }
     }
 
-    mesh->con = tableMallocInt(mesh->Ncon, 4);
+    mesh->con = tableMallocInt(mesh->Ncon, 4);          // 为共享边数组分配内存
     
     face = initFace;
     int jj = 0;
-    for(int ii=0; ii<Nface; ii++)
+    for(int ii=0; ii < Nface; ii++)         // 遍历所有边
     {
-        if(face->full)
+        if(face->full)                      // 该边是共享边
         {
-            mesh->con[jj][0] = face->e0;
-            mesh->con[jj][1] = face->e1;
-            mesh->con[jj][2] = face->p0;
-            mesh->con[jj][3] = face->p1;
+            mesh->con[jj][0] = face->e0;    // 边所属单元
+            mesh->con[jj][1] = face->e1;    // 边邻接单元
+            mesh->con[jj][2] = face->p0;    // 边第一个节点
+            mesh->con[jj][3] = face->p1;    // 边第二个节点
             jj += 1;        
         }
         face0 = face->next;
@@ -709,13 +709,13 @@ void meshCalcNeighbors(MESH* mesh)
 
     int e0, e1;
     
-    for(int ii=0; ii<mesh->Ncon; ii++)
+    for(int ii=0; ii < mesh->Ncon; ii++)
     {
-        e0 = mesh->con[ii][0];
-        e1 = mesh->con[ii][1];
+        e0 = mesh->con[ii][0];      // 边所属单元
+        e1 = mesh->con[ii][1];      // 边邻接单元
 
-        mesh->elemL[e0]->neiL[mesh->elemL[e0]->neiN] = mesh->elemL[e1];
-        mesh->elemL[e1]->neiL[mesh->elemL[e1]->neiN] = mesh->elemL[e0];
+        mesh->elemL[e0]->neiL[mesh->elemL[e0]->neiN] = mesh->elemL[e1];     // 存储邻接单元
+        mesh->elemL[e1]->neiL[mesh->elemL[e1]->neiN] = mesh->elemL[e0];     // 存储邻接单元
                
         mesh->elemL[e0]->neiN += 1;
         mesh->elemL[e1]->neiN += 1;
